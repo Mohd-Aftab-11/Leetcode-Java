@@ -1,0 +1,90 @@
+class Solution {
+    class TrieNode {
+        TrieNode[] children = new TrieNode[26];
+        int id = -1;
+    }
+    private void insert(TrieNode root, String word, int id) {
+        TrieNode node = root;
+        for (char ch : word.toCharArray()) {
+            int idx = ch - 'a';
+            if (node.children[idx] == null) {
+                node.children[idx] = new TrieNode();
+            }
+            node = node.children[idx];
+        }
+        node.id = id;
+    }
+
+    public long minimumCost(String source,String target,String[] original,String[] changed,int[] cost) {
+        int n = source.length();
+        final long INF = Long.MAX_VALUE;
+        TrieNode root = new TrieNode();
+        Map<String, Integer> idMap = new HashMap<>();
+        int nextId = 0;
+        for (int i = 0; i < original.length; i++) {
+            if (!idMap.containsKey(original[i])) {
+                idMap.put(original[i], nextId);
+                insert(root, original[i], nextId++);
+            }
+            if (!idMap.containsKey(changed[i])) {
+                idMap.put(changed[i], nextId);
+                insert(root, changed[i], nextId++);
+            }
+        }
+        long[][] dist = new long[nextId][nextId];
+        for (long[] row : dist){
+            Arrays.fill(row, INF);
+        }
+        for (int i = 0; i < nextId; i++) {
+            dist[i][i] = 0;
+        }
+        for (int i = 0; i < original.length; i++) {
+            int from = idMap.get(original[i]);
+            int to   = idMap.get(changed[i]);
+            dist[from][to] = Math.min(dist[from][to], cost[i]);
+        }
+
+        for (int k = 0; k < nextId; k++) {
+            for (int i = 0; i < nextId; i++) {
+                if (dist[i][k] == INF) continue;
+                for (int j = 0; j < nextId; j++) {
+                    if (dist[k][j] == INF) continue;
+                    dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+        long[] dp = new long[n + 1];
+        Arrays.fill(dp, INF);
+        dp[0] = 0;
+
+        char[] s = source.toCharArray();
+        char[] t = target.toCharArray();
+
+        for (int start = 0; start < n; start++) {
+            if (dp[start] == INF) continue;
+
+            if (s[start] == t[start]) {
+                dp[start + 1] = Math.min(dp[start + 1], dp[start]);
+            }
+
+            TrieNode srcNode = root;
+            TrieNode tgtNode = root;
+
+            for (int end = start; end < n; end++) {
+                srcNode = srcNode.children[s[end] - 'a'];
+                tgtNode = tgtNode.children[t[end] - 'a'];
+
+                if (srcNode == null || tgtNode == null) break;
+
+                if (srcNode.id != -1 && tgtNode.id != -1) {
+                    long c = dist[srcNode.id][tgtNode.id];
+                    if (c != INF) {
+                        dp[end + 1] = Math.min(dp[end + 1], dp[start] + c);
+                    }
+                }
+            }
+        }
+
+        return dp[n] == INF ? -1 : dp[n];
+    }
+}
