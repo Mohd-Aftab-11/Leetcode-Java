@@ -1,0 +1,42 @@
+class Solution {
+    public long maxSumTrionic(int[] nums) {
+        int n = nums.length;
+        long answer = Long.MIN_VALUE;
+        for (int start = 0; start < n; start++) {
+            int idx = start;
+            while (idx + 1 < n && nums[idx] < nums[idx + 1]) {
+                idx++;
+            }
+            int peak1 = idx;
+            if (peak1 == start) continue;
+            long sum = nums[peak1] + nums[peak1 - 1];
+            idx++;
+            while (idx < n && nums[idx - 1] > nums[idx]) {
+                sum += nums[idx];
+                idx++;
+            }
+            int valley = idx - 1;
+            if (valley == peak1 || valley == n - 1 ||(idx < n && nums[idx] == nums[valley])) {
+                start = valley;
+                continue;
+            }
+            sum += nums[valley + 1];
+            long maxExtra = 0, running = 0;
+            for (int i = valley + 2; i < n && nums[i] > nums[i - 1]; i++) {
+                running += nums[i];
+                maxExtra = Math.max(maxExtra, running);
+            }
+            sum += maxExtra;
+            maxExtra = 0;
+            running = 0;
+            for (int i = peak1 - 2; i >= start; i--) {
+                running += nums[i];
+                maxExtra = Math.max(maxExtra, running);
+            }
+            sum += maxExtra;
+            answer = Math.max(answer, sum);
+            start = valley - 1;
+        }
+        return answer;
+    }
+}
