@@ -1,0 +1,20 @@
+class Solution {
+    public int minimumDeletions(String s) {
+        int n = s.length();
+        int[] aSuffix = new int[n + 1];
+        aSuffix[n] = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            aSuffix[i] = aSuffix[i + 1] + (s.charAt(i) == 'a' ? 1 : 0);
+        }
+        
+        int bCount = 0;
+        int minDeletions = n;
+        for (int i = 0; i <= n; i++) {
+            minDeletions = Math.min(minDeletions, bCount + aSuffix[i]);
+            if (i < n && s.charAt(i) == 'b') {
+                bCount++;
+            }
+        }
+        return minDeletions;
+    }
+}
