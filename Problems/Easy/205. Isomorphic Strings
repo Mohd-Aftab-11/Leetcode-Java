@@ -1,0 +1,66 @@
+import java.util.HashMap;
+import java.util.HashSet;
+
+public class Solution {
+    public boolean isIsomorphic(String s, String t) {
+        if (s.length() != t.length()) {
+            return false;
+        }
+        
+        HashMap<Character, Character> map = new HashMap<>();
+        HashSet<Character> mapped = new HashSet<>();
+        
+        for (int i = 0; i < s.length(); i++) {
+            char sChar = s.charAt(i);
+            char tChar = t.charAt(i);
+            
+            if (map.containsKey(sChar)) {
+                if (map.get(sChar) != tChar) {
+                    return false;
+                }
+            } else {
+                if (mapped.contains(tChar)) {
+                    return false;
+                }
+                map.put(sChar, tChar);
+                mapped.add(tChar);
+            }
+        }
+        return true;
+    }
+    
+    public boolean isIsomorphicArray(String s, String t) {
+        if (s.length() != t.length()) {
+            return false;
+        }
+        
+        int[] sToT = new int[256];
+        int[] tToS = new int[256];
+        
+        for (int i = 0; i < s.length(); i++) {
+            char sChar = s.charAt(i);
+            char tChar = t.charAt(i);
+            
+            if (sToT[sChar] != 0 && sToT[sChar] != tChar) {
+                return false;
+            }
+            
+            if (tToS[tChar] != 0 && tToS[tChar] != sChar) {
+                return false;
+            }
+            
+            sToT[sChar] = tChar;
+            tToS[tChar] = sChar;
+        }
+        return true;
+    }
+    
+    public static void main(String[] args) {
+        Solution sol = new Solution();
+        
+        System.out.println(sol.isIsomorphic("egg", "add"));
+        System.out.println(sol.isIsomorphic("foo", "bar"));
+        System.out.println(sol.isIsomorphic("paper", "title"));
+        System.out.println(sol.isIsomorphic("badc", "baba"));
+    }
+}
