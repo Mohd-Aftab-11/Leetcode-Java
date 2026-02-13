@@ -1,0 +1,74 @@
+class Solution {
+    public int longestBalanced(String s) {
+        int n = s.length();
+        int maxLength = 0;
+
+        int index = 0;
+        while (index < n) {
+            int end = index;
+            while (end < n && s.charAt(end) == s.charAt(index)) {
+                end++;
+            }
+            maxLength = Math.max(maxLength, end - index);
+            index = end;
+        }
+
+        maxLength = Math.max(maxLength, longestTwoCharBalanced(s, 'a', 'b', 'c'));
+        maxLength = Math.max(maxLength, longestTwoCharBalanced(s, 'a', 'c', 'b'));
+        maxLength = Math.max(maxLength, longestTwoCharBalanced(s, 'b', 'c', 'a'));
+
+        int countA = 0, countB = 0, countC = 0;
+        Map<String, Integer> prefixMap = new HashMap<>();
+        prefixMap.put("0,0", -1);
+
+        for (int i = 0; i < n; i++) {
+            char ch = s.charAt(i);
+            if (ch == 'a') countA++;
+            else if (ch == 'b') countB++;
+            else countC++;
+
+            String key = (countA - countB) + "," + (countA - countC);
+
+            if (prefixMap.containsKey(key)) {
+                maxLength = Math.max(maxLength, i - prefixMap.get(key));
+            } else {
+                prefixMap.put(key, i);
+            }
+        }
+
+        return maxLength;
+    }
+
+    private int longestTwoCharBalanced(String s, char char1, char char2, char ignoreChar) {
+        int n = s.length();
+        int maxLen = 0;
+        int i = 0;
+
+        while (i < n) {
+            if (s.charAt(i) == ignoreChar) {
+                i++;
+                continue;
+            }
+
+            int start = i;
+            int balance = 0;
+            Map<Integer, Integer> firstOccurrence = new HashMap<>();
+            firstOccurrence.put(0, start);
+
+            int j = start;
+            while (j < n && s.charAt(j) != ignoreChar) {
+                balance += (s.charAt(j) == char1) ? 1 : -1;
+
+                if (!firstOccurrence.containsKey(balance)) {
+                    firstOccurrence.put(balance, j + 1);
+                } else {
+                    maxLen = Math.max(maxLen, j + 1 - firstOccurrence.get(balance));
+                }
+                j++;
+            }
+            i = j;
+        }
+
+        return maxLen;
+    }
+}
