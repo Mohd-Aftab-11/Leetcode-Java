@@ -1,0 +1,36 @@
+class Solution {
+    public String[] findWords(String[] words) {
+        Map<Character, Integer> rowMap = new HashMap<>();
+        
+        String[] rows = {"qwertyuiop", "asdfghjkl", "zxcvbnm"};
+        for (int i = 0; i < rows.length; i++) {
+            for (char c : rows[i].toCharArray()) {
+                rowMap.put(c, i);
+            }
+        }
+        
+        List<String> result = new ArrayList<>();
+        
+        for (String word : words) {
+            if (isOneRowWord(word.toLowerCase(), rowMap)) {
+                result.add(word);
+            }
+        }
+        
+        return result.toArray(new String[0]);
+    }
+    
+    private boolean isOneRowWord(String word, Map<Character, Integer> rowMap) {
+        if (word.isEmpty()) return true;
+        
+        int targetRow = rowMap.get(word.charAt(0));
+        
+        for (char c : word.toCharArray()) {
+            if (rowMap.get(c) != targetRow) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+}
