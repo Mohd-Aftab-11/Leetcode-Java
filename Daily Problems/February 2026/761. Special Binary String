@@ -1,0 +1,31 @@
+class Solution {
+    public String makeLargestSpecial(String s) {
+        if (s == null || s.length() == 0) {
+            return s;
+        }
+        
+        List<String> specialSubstrings = new ArrayList<>();
+        
+        int count = 0;
+        int start = 0;
+        
+        for (int i = 0; i < s.length(); i++) {
+            count += s.charAt(i) == '1' ? 1 : -1;
+            
+            if (count == 0) {
+                String inner = makeLargestSpecial(s.substring(start + 1, i));
+                specialSubstrings.add("1" + inner + "0");
+                start = i + 1;
+            }
+        }
+        
+        Collections.sort(specialSubstrings, Collections.reverseOrder());
+        
+        StringBuilder result = new StringBuilder();
+        for (String sub : specialSubstrings) {
+            result.append(sub);
+        }
+        
+        return result.toString();
+    }
+}
