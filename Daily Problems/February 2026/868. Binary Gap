@@ -1,0 +1,21 @@
+class Solution {
+    public int binaryGap(int n) {
+        int maxDistance = 0;
+        int prevPosition = -1;
+        int currentPosition = 0;
+        
+        while (n > 0) {
+            if ((n & 1) == 1) {
+                if (prevPosition != -1) {
+                    maxDistance = Math.max(maxDistance, currentPosition - prevPosition);
+                }
+                prevPosition = currentPosition;
+            }
+            
+            n >>= 1;
+            currentPosition++;
+        }
+        
+        return maxDistance;
+    }
+}
