@@ -1,0 +1,25 @@
+class Solution {
+    public boolean hasAllCodes(String s, int k) {
+        if (s.length() < k) {
+            return false;
+        }
+        
+        int need = 1 << k;  // 2^k
+        
+        if (s.length() - k + 1 < need) {
+            return false;
+        }
+        
+        Set<String> codes = new HashSet<>();
+        
+        for (int i = 0; i <= s.length() - k; i++) {
+            codes.add(s.substring(i, i + k));
+            
+            if (codes.size() == need) {
+                return true;
+            }
+        }
+        
+        return codes.size() == need;
+    }
+}
