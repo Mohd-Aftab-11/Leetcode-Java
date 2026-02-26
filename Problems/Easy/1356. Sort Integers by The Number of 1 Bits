@@ -1,0 +1,25 @@
+class Solution {
+    public int[] sortByBits(int[] arr) {
+        Integer[] integerArr = new Integer[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            integerArr[i] = arr[i];
+        }
+        
+        Arrays.sort(integerArr, (a, b) -> {
+            int bitCountA = Integer.bitCount(a);
+            int bitCountB = Integer.bitCount(b);
+            
+            if (bitCountA != bitCountB) {
+                return bitCountA - bitCountB;
+            }
+            return a - b;
+        });
+        
+        int[] result = new int[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            result[i] = integerArr[i];
+        }
+        
+        return result;
+    }
+}
