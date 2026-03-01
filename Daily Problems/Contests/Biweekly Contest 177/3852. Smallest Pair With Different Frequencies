@@ -1,0 +1,34 @@
+class Solution {
+    public int[] minDistinctFreqPair(int[] nums) {
+        if (nums == null || nums.length < 2) {
+            return new int[]{-1, -1};
+        }
+        
+        Map<Integer, Integer> freqMap = new HashMap<>();
+
+        for (int num : nums) {
+            freqMap.put(num, freqMap.getOrDefault(num, 0) + 1);
+        }
+        if ( freqMap.size() < 2) {
+            return new int[]{-1, -1};
+        }
+        List<Integer> uniqueNums = new ArrayList<>(freqMap.keySet());
+
+        Collections.sort(uniqueNums);
+
+        for (int i = 0; i < uniqueNums.size(); i++) {
+            int x = uniqueNums.get(i);
+            int freqX = freqMap.get(x);
+
+            for (int j = i + 1; j < uniqueNums.size(); j++) {
+                int y = uniqueNums.get(j);
+                int freqY = freqMap.get(y);
+
+                if (freqX != freqY) {
+                    return new int[]{x, y};
+                }
+            }
+        }
+        return new int[]{-1, -1};
+    }
+}
