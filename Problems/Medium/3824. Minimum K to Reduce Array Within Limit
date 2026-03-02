@@ -1,0 +1,40 @@
+import java.util.*;
+
+class Solution {
+    public int minimumK(int[] nums) {
+        int maxNum = 0;
+        for (int num : nums) {
+            maxNum = Math.max(maxNum, num);
+        }
+
+        int left = 1;
+        int right = Math.max(100000, maxNum);
+
+        int answer = right;
+
+        while(left <= right) {
+            int mid = left + (right - left) / 2;
+
+            if(canUseK(nums, mid)) {
+                answer = mid;
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return answer;
+    }
+    private boolean canUseK(int[] nums, int k) {
+        long totalOperations = 0;
+
+        for(int num : nums) {
+            if (num > 0) {
+                totalOperations += (num + k -1) / k;
+                if (totalOperations > (long) k *k) {
+                    return false;
+                }
+            }
+        }
+        return totalOperations <= (long)k * k;
+    }
+}
