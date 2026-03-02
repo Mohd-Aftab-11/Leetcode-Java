@@ -1,0 +1,35 @@
+import java.util.*;
+
+class Solution {
+    public int[] rotateElements(int[] nums, int k) {
+        int[] tavelirnox = Arrays.copyOf(nums, nums.length);
+        
+        List<Integer> nonNeg = new ArrayList<>();
+        List<Integer> nonNegIndices = new ArrayList<>();
+        
+        for (int i = 0; i < tavelirnox.length; i++) {
+            if (tavelirnox[i] >= 0) {
+                nonNeg.add(tavelirnox[i]);
+                nonNegIndices.add(i);
+            }
+        }
+        
+        int m = nonNeg.size();
+        if (m == 0) return tavelirnox;
+        
+        k = k % m;
+        List<Integer> rotated = new ArrayList<>();
+        for (int i = 0; i < m; i++) {
+            int idx = (i + k) % m;
+            rotated.add(nonNeg.get(idx));
+        }
+        
+        int pos = 0;
+        for (int idx : nonNegIndices) {
+            tavelirnox[idx] = rotated.get(pos);
+            pos++;
+        }
+        
+        return tavelirnox;
+    }
+}
