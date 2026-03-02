@@ -1,0 +1,40 @@
+WITH user_stats AS (
+    SELECT 
+        user_id,
+        COUNT(*) AS total_reactions,
+        COUNT(DISTINCT content_id) AS distinct_content_count
+    FROM reactions
+    GROUP BY user_id
+    HAVING COUNT(DISTINCT content_id) >= 5
+),
+reaction_counts AS (
+    SELECT 
+        r.user_id,
+        r.reaction,
+        COUNT(*) AS reaction_count
+    FROM reactions r
+    INNER JOIN user_stats us ON r.user_id = us.user_id
+    GROUP BY r.user_id, r.reaction
+),
+dominant_reactions AS (
+    SELECT 
+        rc.user_id,
+        rc.reaction AS dominant_reaction,
+        rc.reaction_count,
+        us.total_reactions,
+        ROUND(rc.reaction_count * 1.0 / us.total_reactions, 2) AS reaction_ratio
+    FROM reaction_counts rc
+    INNER JOIN user_stats us ON rc.user_id = us.user_id
+    WHERE rc.reaction_count = (
+        SELECT MAX(rc2.reaction_count)
+        FROM reaction_counts rc2
+        WHERE rc2.user_id = rc.user_id
+    )
+)
+SELECT 
+    user_id,
+    dominant_reaction,
+    reaction_ratio
+FROM dominant_reactions
+WHERE reaction_ratio >= 0.60
+ORDER BY reaction_ratio DESC, user_id ASC;
