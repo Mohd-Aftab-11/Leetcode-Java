@@ -1,0 +1,22 @@
+WITH FirstLogin AS (
+    SELECT 
+        player_id,
+        MIN(event_date) as first_login
+    FROM Activity
+    GROUP BY player_id
+),
+ConsecutiveLogin AS (
+    SELECT 
+        COUNT(DISTINCT a.player_id) as consecutive_players
+    FROM Activity a
+    JOIN FirstLogin f 
+        ON a.player_id = f.player_id
+        AND a.event_date = DATE_ADD(f.first_login, INTERVAL 1 DAY)
+)
+SELECT 
+    ROUND(
+        (SELECT consecutive_players FROM ConsecutiveLogin) / 
+        COUNT(DISTINCT player_id), 
+        2
+    ) as fraction
+FROM Activity;
