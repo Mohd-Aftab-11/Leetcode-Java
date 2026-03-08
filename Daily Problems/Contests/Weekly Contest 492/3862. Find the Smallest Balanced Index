@@ -1,0 +1,28 @@
+class Solution {
+    public int smallestBalancedIndex(int[] nums) {
+        int n = nums.length;
+        long LIMIT = (long) 1e14;
+        long[] suffixProduct = new long[n + 1];
+        suffixProduct[n] = 1;
+        for (int i = n - 1; i >= 0; i--) {
+            if (suffixProduct[i + 1] > LIMIT / nums[i]) {
+                while (i >= 0) {
+                    suffixProduct[i] = LIMIT + 1;
+                    i--;
+                }
+                break;
+            } else {
+                suffixProduct[i] = suffixProduct[i + 1] * nums[i];
+            }
+        }
+        long leftSum = 0;
+        for (int i = 0; i < n; i++) {
+            long rightProduct = suffixProduct[i + 1];
+            if (leftSum == rightProduct) {
+                return i;
+            }
+            leftSum += nums[i];
+        }
+        return -1;
+    }
+}
