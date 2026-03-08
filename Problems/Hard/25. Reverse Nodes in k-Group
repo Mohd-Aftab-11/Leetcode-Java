@@ -1,0 +1,39 @@
+class Solution {
+    public ListNode reverseKGroup(ListNode head, int k) {
+        if (head == null || k == 1) {
+            return head;
+        }
+        
+        ListNode current = head;
+        int count = 0;
+        while (current != null && count < k) {
+            current = current.next;
+            count++;
+        }
+        
+        if (count == k) {
+            ListNode reversedHead = reverseFirstK(head, k);
+            
+            head.next = reverseKGroup(current, k);
+            
+            return reversedHead;
+        }
+        
+        return head;
+    }
+    
+    private ListNode reverseFirstK(ListNode head, int k) {
+        ListNode prev = null;
+        ListNode current = head;
+        ListNode next = null;
+        
+        for (int i = 0; i < k && current != null; i++) {
+            next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
+        }
+        
+        return prev;
+    }
+}
