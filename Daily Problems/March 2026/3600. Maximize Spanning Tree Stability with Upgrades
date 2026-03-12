@@ -1,0 +1,133 @@
+class Solution {
+    public int maxStability(int n, int[][] edges, int k) {
+        int left = 1;
+        int right = 0;
+        
+        for (int[] edge : edges) {
+            right = Math.max(right, edge[2] * 2);
+        }
+        
+        int result = -1;
+        
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            
+            if (isPossible(n, edges, k, mid)) {
+                result = mid;
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        
+        return result;
+    }
+    
+    private boolean isPossible(int n, int[][] edges, int k, int minStrength) {
+        UnionFind uf = new UnionFind(n);
+        int edgesUsed = 0;
+        int upgradesNeeded = 0;
+        
+        for (int[] edge : edges) {
+            if (edge[3] == 1) {
+                int u = edge[0];
+                int v = edge[1];
+                int strength = edge[2];
+                
+                if (strength < minStrength) {
+                    return false;
+                }
+                
+                if (uf.find(u) == uf.find(v)) {
+                    return false;
+                }
+                
+                uf.union(u, v);
+                edgesUsed++;
+            }
+        }
+        
+        if (edgesUsed > n - 1) {
+            return false;
+        }
+        
+        List<int[]> optionalEdges = new ArrayList<>();
+        
+        for (int[] edge : edges) {
+            if (edge[3] == 0) {
+                int u = edge[0];
+                int v = edge[1];
+                int strength = edge[2];
+                
+                if (strength >= minStrength) {
+                    if (uf.find(u) != uf.find(v)) {
+                        uf.union(u, v);
+                        edgesUsed++;
+                    }
+                } else {
+                    if (strength * 2 >= minStrength) {
+                        optionalEdges.add(new int[]{u, v, strength});
+                    }
+                }
+            }
+        }
+        
+        optionalEdges.sort((a, b) -> b[2] - a[2]);
+        
+        for (int[] edge : optionalEdges) {
+            if (edgesUsed == n - 1) {
+                break;
+            }
+            
+            int u = edge[0];
+            int v = edge[1];
+            
+            if (uf.find(u) != uf.find(v)) {
+                upgradesNeeded++;
+                if (upgradesNeeded > k) {
+                    return false;
+                }
+                uf.union(u, v);
+                edgesUsed++;
+            }
+        }
+        
+        return edgesUsed == n - 1 && upgradesNeeded <= k;
+    }
+    
+    class UnionFind {
+        private int[] parent;
+        private int[] rank;
+        
+        public UnionFind(int n) {
+            parent = new int[n];
+            rank = new int[n];
+            for (int i = 0; i < n; i++) {
+                parent[i] = i;
+            }
+        }
+        
+        public int find(int x) {
+            if (parent[x] != x) {
+                parent[x] = find(parent[x]);
+            }
+            return parent[x];
+        }
+        
+        public void union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+            
+            if (rootX != rootY) {
+                if (rank[rootX] < rank[rootY]) {
+                    parent[rootX] = rootY;
+                } else if (rank[rootX] > rank[rootY]) {
+                    parent[rootY] = rootX;
+                } else {
+                    parent[rootY] = rootX;
+                    rank[rootX]++;
+                }
+            }
+        }
+    }
+}
