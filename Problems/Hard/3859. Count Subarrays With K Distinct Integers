@@ -1,0 +1,42 @@
+class Solution {
+    public long countSubarrays(int[] nums, int k, int m) {
+        int[] freq1 = new int[100005];
+        int[] freq2 = new int[100005];
+
+        int left1 = 0;
+        int left2 = 0;
+        int dist1 = 0;
+        int valid2 = 0;
+        long result = 0;
+
+        for (int right = 0; right < nums.length; right++) {
+            int val = nums[right];
+
+            if (freq1[val] == 0) dist1++;
+            freq1[val]++;
+
+            while (dist1 > k) {
+                int remove = nums[left1];
+                freq1[remove]--;
+                if (freq1[remove] == 0) dist1--;
+                left1++;
+            }
+
+            freq2[val]++;
+            if (freq2[val] == m) valid2++;
+
+            while (valid2 == k) {
+                int remove = nums[left2];
+                freq2[remove]--;
+                if (freq2[remove] == m - 1) valid2--;
+                left2++;
+            }
+
+            if (left2 > left1) {
+                result += (left2 - left1);
+            }
+        }
+
+        return result;
+    }
+}
