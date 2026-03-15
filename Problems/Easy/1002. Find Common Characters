@@ -1,0 +1,26 @@
+class Solution {
+    public List<String> commonChars(String[] words) {
+        List<String> result = new ArrayList<>();
+        
+        for (char c : words[0].toCharArray()) {
+            boolean commonInAll = true;
+            
+            for (int i = 1; i < words.length; i++) {
+                if (words[i].indexOf(c) == -1) {
+                    commonInAll = false;
+                    break;
+                }
+            }
+            
+            if (commonInAll) {
+                result.add(String.valueOf(c));
+                
+                for (int i = 1; i < words.length; i++) {
+                    words[i] = words[i].replaceFirst(String.valueOf(c), "");
+                }
+            }
+        }
+        
+        return result;
+    }
+}
