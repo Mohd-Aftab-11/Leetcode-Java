@@ -1,0 +1,39 @@
+class Solution {
+    public int minimumOR(int[][] grid) {
+        int result = 0;
+        int maxBit = 0;
+        
+        for (int[] row : grid) {
+            for (int val : row) {
+                maxBit = Math.max(maxBit, Integer.highestOneBit(val));
+            }
+        }
+        
+        for (int bit = maxBit; bit > 0; bit >>= 1) {
+            int candidate = result | (bit - 1);
+            boolean valid = true;
+            
+            for (int[] row : grid) {
+                boolean found = false;
+                for (int val : row) {
+                    if ((val & candidate) == val) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    valid = false;
+                    break;
+                }
+            }
+            
+            if (valid) {
+                continue;
+            } else {
+                result |= bit;
+            }
+        }
+        
+        return result;
+    }
+}
