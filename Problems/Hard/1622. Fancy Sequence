@@ -1,0 +1,69 @@
+class Fancy {
+    private static final int MOD = 1000000007;
+    private List<Integer> values;
+    private List<Integer> mulAtAdd;
+    private List<Integer> addAtAdd;
+    private long currentMul;
+    private long currentAdd;
+    
+    public Fancy() {
+        values = new ArrayList<>();
+        mulAtAdd = new ArrayList<>();
+        addAtAdd = new ArrayList<>();
+        currentMul = 1;
+        currentAdd = 0;
+    }
+    
+    public void append(int val) {
+        values.add(val);
+        mulAtAdd.add((int)currentMul);
+        addAtAdd.add((int)currentAdd);
+    }
+    
+    public void addAll(int inc) {
+        currentAdd = (currentAdd + inc) % MOD;
+    }
+    
+    public void multAll(int m) {
+        currentMul = (currentMul * m) % MOD;
+        currentAdd = (currentAdd * m) % MOD;
+    }
+    
+    public int getIndex(int idx) {
+        if (idx >= values.size()) {
+            return -1;
+        }
+        
+        long originalVal = values.get(idx);
+        long mulAtIdx = mulAtAdd.get(idx);
+        long addAtIdx = addAtAdd.get(idx);
+        
+        long invMulAtIdx = modInverse(mulAtIdx, MOD);
+        
+        long effectiveMul = (currentMul * invMulAtIdx) % MOD;
+        
+        long result = (originalVal * effectiveMul) % MOD;
+        result = (result + (currentAdd - (addAtIdx * effectiveMul) % MOD + MOD) % MOD) % MOD;
+        
+        return (int)result;
+    }
+    
+    private long modInverse(long a, long mod) {
+        return modPow(a, mod - 2, mod);
+    }
+    
+    private long modPow(long base, long exponent, long mod) {
+        long result = 1;
+        base %= mod;
+        
+        while (exponent > 0) {
+            if ((exponent & 1) == 1) {
+                result = (result * base) % mod;
+            }
+            base = (base * base) % mod;
+            exponent >>= 1;
+        }
+        
+        return result;
+    }
+}
