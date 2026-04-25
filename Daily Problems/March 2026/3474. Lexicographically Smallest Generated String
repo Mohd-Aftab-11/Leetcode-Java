@@ -1,0 +1,79 @@
+class Solution {
+    public String generateString(String str1, String str2) {
+        int n = str1.length();
+        int m = str2.length();
+        int len = n + m - 1;
+        char[] word = new char[len];
+        for (int i = 0; i < len; i++) word[i] = '?';
+        
+        for (int i = 0; i < n; i++) {
+            if (str1.charAt(i) == 'T') {
+                for (int j = 0; j < m; j++) {
+                    int idx = i + j;
+                    char expected = str2.charAt(j);
+                    if (word[idx] == '?') {
+                        word[idx] = expected;
+                    } else if (word[idx] != expected) {
+                        return "";
+                    }
+                }
+            }
+        }
+        
+        for (int i = 0; i < len; i++) {
+            if (word[i] == '?') word[i] = 'a';
+        }
+        
+        boolean changed;
+        do {
+            changed = false;
+            for (int i = 0; i < n; i++) {
+                if (str1.charAt(i) == 'F') {
+                    boolean equal = true;
+                    for (int j = 0; j < m; j++) {
+                        if (word[i + j] != str2.charAt(j)) {
+                            equal = false;
+                            break;
+                        }
+                    }
+                    if (equal) {
+                        for (int j = m - 1; j >= 0; j--) {
+                            int idx = i + j;
+                            boolean forced = false;
+                            for (int t = 0; t < n; t++) {
+                                if (str1.charAt(t) == 'T' && t <= idx && idx < t + m) {
+                                    forced = true;
+                                    break;
+                                }
+                            }
+                            if (!forced) {
+                                char newChar = (char)(word[idx] + 1);
+                                if (newChar > 'z') {
+                                    return "";
+                                }
+                                word[idx] = newChar;
+                                changed = true;
+                                break;
+                            }
+                        }
+                        if (!changed) return "";
+                    }
+                }
+            }
+        } while (changed);
+        
+        for (int i = 0; i < n; i++) {
+            if (str1.charAt(i) == 'F') {
+                boolean equal = true;
+                for (int j = 0; j < m; j++) {
+                    if (word[i + j] != str2.charAt(j)) {
+                        equal = false;
+                        break;
+                    }
+                }
+                if (equal) return "";
+            }
+        }
+        return new String(word);
+    }
+}
