@@ -1,0 +1,72 @@
+class Solution {
+    public int maxWalls(int[] robots, int[] distance, int[] walls) {
+        int n = robots.length;
+        int[] left = new int[n];
+        int[] right = new int[n];
+        int[] overlap = new int[n];
+        Map<Integer, Integer> robotDist = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            robotDist.put(robots[i], distance[i]);
+        }
+        Arrays.sort(robots);
+        Arrays.sort(walls);
+        for (int i = 0; i < n; i++) {
+            int pos = robots[i];
+            int d = robotDist.get(pos);
+            int rightStartIdx = upperBound(walls, pos);
+            int leftStartIdx;
+            if (i > 0) {
+                int leftLimit = Math.max(pos - d, robots[i - 1] + 1);
+                leftStartIdx = lowerBound(walls, leftLimit);
+            } else {
+                leftStartIdx = lowerBound(walls, pos - d);
+            }
+            left[i] = rightStartIdx - leftStartIdx;
+            int rightEndIdx;
+            if (i < n - 1) {
+                int rightLimit = Math.min(pos + d, robots[i + 1] - 1);
+                rightEndIdx = upperBound(walls, rightLimit);
+            } else {
+                rightEndIdx = upperBound(walls, pos + d);
+            }
+            int rightStart = lowerBound(walls, pos);
+            right[i] = rightEndIdx - rightStart;
+            if (i > 0) {
+                int prevStart = lowerBound(walls, robots[i - 1]);
+                overlap[i] = rightStartIdx - prevStart;
+            }
+        }
+        int takeLeft = left[0];
+        int takeRight = right[0];
+        for (int i = 1; i < n; i++) {
+            int newLeft = Math.max(
+                takeLeft + left[i],
+                takeRight
+                    - right[i - 1]
+                    + Math.min(left[i] + right[i - 1], overlap[i])
+            );
+            int newRight = Math.max(takeLeft + right[i], takeRight + right[i]);
+            takeLeft = newLeft;
+            takeRight = newRight;
+        }
+        return Math.max(takeLeft, takeRight);
+    }
+    private int lowerBound(int[] arr, int target) {
+        int l = 0, r = arr.length;
+        while (l < r) {
+            int mid = (l + r) / 2;
+            if (arr[mid] < target) l = mid + 1;
+            else r = mid;
+        }
+        return l;
+    }
+    private int upperBound(int[] arr, int target) {
+        int l = 0, r = arr.length;
+        while (l < r) {
+            int mid = (l + r) / 2;
+            if (arr[mid] <= target) l = mid + 1;
+            else r = mid;
+        }
+        return l;
+    }
+}
