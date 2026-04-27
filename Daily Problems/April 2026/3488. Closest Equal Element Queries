@@ -1,0 +1,42 @@
+import java.util.*;
+
+class Solution {
+    public List<Integer> solveQueries(int[] nums, int[] queries) {
+        int n = nums.length;
+        
+        Map<Integer, List<Integer>> valueToIndices = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            valueToIndices.computeIfAbsent(nums[i], k -> new ArrayList<>()).add(i);
+        }
+        
+        List<Integer> result = new ArrayList<>();
+        
+        for (int q : queries) {
+            int value = nums[q];
+            List<Integer> indices = valueToIndices.get(value);
+            
+            if (indices.size() == 1) {
+                result.add(-1);
+                continue;
+            }
+            
+            int pos = Collections.binarySearch(indices, q);
+            int size = indices.size();
+            
+            int prevIndex = indices.get((pos - 1 + size) % size);
+            int nextIndex = indices.get((pos + 1) % size);
+            
+            int distToPrev = circularDistance(q, prevIndex, n);
+            int distToNext = circularDistance(q, nextIndex, n);
+            
+            result.add(Math.min(distToPrev, distToNext));
+        }
+        return result;
+    }
+    
+    private int circularDistance(int from, int to, int n) {
+        int direct = Math.abs(from - to);
+        int circular = n - direct;
+        return Math.min(direct, circular);
+    }
+}
