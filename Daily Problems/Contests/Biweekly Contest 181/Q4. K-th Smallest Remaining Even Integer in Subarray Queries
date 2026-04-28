@@ -1,0 +1,58 @@
+class Solution {
+    public int[] kthRemainingInteger(int[] nums, int[][] queries) {
+        int n = nums.length;
+        int[] prefixEven = new int[n];
+        prefixEven[0] = (nums[0] % 2 == 0) ? 1 : 0;
+        for (int i = 1; i < n; i++) {
+            prefixEven[i] = prefixEven[i - 1] + ((nums[i] % 2 == 0) ? 1 : 0);
+        }
+
+        int[] ans = new int[queries.length];
+
+        for (int q = 0; q < queries.length; q++) {
+            int li = queries[q][0];
+            int ri = queries[q][1];
+            long ki = queries[q][2];
+
+            long low = 2;
+            long high = 2L * (ki + (ri - li + 1)) + nums[ri];
+
+            while (low < high) {
+                long mid = low + (high - low) / 2;
+                if (feasible(nums, prefixEven, li, ri, ki, mid)) {
+                    high = mid;
+                } else {
+                    low = mid + 1;
+                }
+            }
+            ans[q] = (int) low;
+        }
+        return ans;
+    }
+
+    private boolean feasible(int[] nums, int[] prefixEven, int li, int ri, long ki, long m) {
+        long totalEven = m / 2;
+
+        int ub = upperBound(nums, (int) m);
+        int endIdx = Math.min(ri, ub - 1);
+        long removed = 0;
+        if (endIdx >= li) {
+            removed = prefixEven[endIdx] - (li > 0 ? prefixEven[li - 1] : 0);
+        }
+
+        return (totalEven - removed) >= ki;
+    }
+
+    private int upperBound(int[] nums, int key) {
+        int lo = 0, hi = nums.length;
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (nums[mid] <= key) {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+        return lo;
+    }
+}
