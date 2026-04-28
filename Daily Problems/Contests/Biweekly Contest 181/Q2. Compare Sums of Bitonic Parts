@@ -1,0 +1,32 @@
+class Solution {
+    public int compareBitonicSums(int[] nums) {
+        int n = nums.length;
+
+        int peakIndex = 0;
+        for (int i = 0; i < n - 1; i++) {
+            if (nums[i] < nums[i + 1]) {
+                peakIndex = i + 1;
+            } else {
+                break;
+            }
+        }
+
+        long ascendingSum = 0;
+        for (int i = 0; i <= peakIndex; i++) {
+            ascendingSum += nums[i];
+        }
+
+        long descendingSum = 0;
+        for (int i = peakIndex; i < n; i++) {
+            descendingSum += nums[i];
+        }
+
+        if (ascendingSum > descendingSum) {
+            return 0;
+        } else if (descendingSum > ascendingSum) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+}
