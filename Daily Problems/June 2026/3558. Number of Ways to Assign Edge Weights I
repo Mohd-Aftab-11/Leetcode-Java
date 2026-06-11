@@ -1,0 +1,46 @@
+import java.util.*;
+
+class Solution {
+    static final int MOD = 1_000_000_007;
+    List<Integer>[] tree;
+    
+    public int assignEdgeWeights(int[][] edges) {
+        int n = edges.length + 1;
+        tree = new List[n + 1];
+        for (int i = 1; i <= n; i++) tree[i] = new ArrayList<>();
+        
+        for (int[] e : edges) {
+            int u = e[0], v = e[1];
+            tree[u].add(v);
+            tree[v].add(u);
+        }
+        
+        int[] depth = new int[n + 1];
+        dfs(1, -1, depth);
+        
+        int maxDepth = 0;
+        for (int d : depth) maxDepth = Math.max(maxDepth, d);
+        
+        if (maxDepth == 0) return 0;
+        return powMod(2, maxDepth - 1);
+    }
+    
+    private void dfs(int u, int parent, int[] depth) {
+        for (int v : tree[u]) {
+            if (v != parent) {
+                depth[v] = depth[u] + 1;
+                dfs(v, u, depth);
+            }
+        }
+    }
+    
+    private int powMod(long a, long b) {
+        long res = 1;
+        while (b > 0) {
+            if ((b & 1) == 1) res = (res * a) % MOD;
+            a = (a * a) % MOD;
+            b >>= 1;
+        }
+        return (int) res;
+    }
+}
