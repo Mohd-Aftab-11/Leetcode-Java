@@ -1,0 +1,95 @@
+import java.util.*;
+
+class Solution {
+    static final int MOD = 1_000_000_007;
+    List<Integer>[] tree;
+    int[] depth;
+    int[][] up;
+    int LOG;
+    
+    void dfs(int u, int p) {
+        up[u][0] = p;
+        for (int v : tree[u]) {
+            if (v != p) {
+                depth[v] = depth[u] + 1;
+                dfs(v, u);
+            }
+        }
+    }
+    
+    void preprocess(int n) {
+        LOG = (int)(Math.log(n) / Math.log(2)) + 1;
+        up = new int[n + 1][LOG];
+        depth = new int[n + 1];
+        dfs(1, -1);
+        for (int k = 1; k < LOG; k++) {
+            for (int i = 1; i <= n; i++) {
+                if (up[i][k - 1] != -1) {
+                    up[i][k] = up[up[i][k - 1]][k - 1];
+                } else {
+                    up[i][k] = -1;
+                }
+            }
+        }
+    }
+    
+    int lca(int u, int v) {
+        if (depth[u] < depth[v]) {
+            int t = u;
+            u = v;
+            v = t;
+        }
+        int diff = depth[u] - depth[v];
+        for (int k = LOG - 1; k >= 0; k--) {
+            if ((diff & (1 << k)) != 0) {
+                u = up[u][k];
+            }
+        }
+        if (u == v) return u;
+        for (int k = LOG - 1; k >= 0; k--) {
+            if (up[u][k] != up[v][k]) {
+                u = up[u][k];
+                v = up[v][k];
+            }
+        }
+        return up[u][0];
+    }
+    
+    long powMod(long a, long b) {
+        long res = 1;
+        while (b > 0) {
+            if ((b & 1) == 1) res = res * a % MOD;
+            a = a * a % MOD;
+            b >>= 1;
+        }
+        return res;
+    }
+    
+    public int[] assignEdgeWeights(int[][] edges, int[][] queries) {
+        int n = edges.length + 1;
+        tree = new List[n + 1];
+        for (int i = 1; i <= n; i++) tree[i] = new ArrayList<>();
+        for (int[] e : edges) {
+            int u = e[0], v = e[1];
+            tree[u].add(v);
+            tree[v].add(u);
+        }
+        
+        preprocess(n);
+        
+        int q = queries.length;
+        int[] ans = new int[q];
+        for (int i = 0; i < q; i++) {
+            int u = queries[i][0];
+            int v = queries[i][1];
+            if (u == v) {
+                ans[i] = 0;
+                continue;
+            }
+            int l = lca(u, v);
+            int dist = depth[u] + depth[v] - 2 * depth[l];
+            ans[i] = (int) powMod(2, dist - 1);
+        }
+        return ans;
+    }
+}
