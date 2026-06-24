@@ -1,0 +1,79 @@
+class Solution {
+    private static final int MOD = 1_000_000_007;
+    
+    public int zigZagArrays(int n, int l, int r) {
+        if (n == 1) return r - l + 1;
+        if (n == 2) {
+            long k = r - l + 1;
+            return (int)((k * (k - 1)) % MOD);
+        }
+        
+        int k = r - l + 1;
+        int size = 2 * k;
+        
+        long[][] mat = new long[size][size];
+        for (int x = 0; x < k; x++) {
+            for (int y = 0; y < k; y++) {
+                if (x > y) {
+                    mat[x][k + y] = 1;
+                }
+                if (x < y) {
+                    mat[k + x][y] = 1;
+                }
+            }
+        }
+        
+        long[] vec = new long[size];
+        for (int x = 0; x < k; x++) {
+            vec[x] = x;
+            vec[k + x] = (k - 1 - x);
+        }
+        
+        long[][] matPow = matrixPower(mat, n - 2);
+        long[] res = multiplyMatrixVector(matPow, vec);
+        
+        long ans = 0;
+        for (long v : res) ans = (ans + v) % MOD;
+        return (int) ans;
+    }
+    
+    private long[][] matrixPower(long[][] a, long pow) {
+        int n = a.length;
+        long[][] res = new long[n][n];
+        for (int i = 0; i < n; i++) res[i][i] = 1;
+        while (pow > 0) {
+            if ((pow & 1) == 1) res = multiplyMatrix(res, a);
+            a = multiplyMatrix(a, a);
+            pow >>= 1;
+        }
+        return res;
+    }
+    
+    private long[][] multiplyMatrix(long[][] a, long[][] b) {
+        int n = a.length;
+        long[][] res = new long[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                long sum = 0;
+                for (int p = 0; p < n; p++) {
+                    sum = (sum + a[i][p] * b[p][j]) % MOD;
+                }
+                res[i][j] = sum;
+            }
+        }
+        return res;
+    }
+    
+    private long[] multiplyMatrixVector(long[][] mat, long[] vec) {
+        int n = mat.length;
+        long[] res = new long[n];
+        for (int i = 0; i < n; i++) {
+            long sum = 0;
+            for (int j = 0; j < n; j++) {
+                sum = (sum + mat[i][j] * vec[j]) % MOD;
+            }
+            res[i] = sum;
+        }
+        return res;
+    }
+}
