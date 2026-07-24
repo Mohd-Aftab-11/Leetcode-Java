@@ -1,0 +1,162 @@
+import java.util.*;
+
+class Solution {
+    
+    private static class SegmentTree {
+        private int n;
+        private int[] tree;
+        
+        public SegmentTree(int[] arr) {
+            if (arr == null || arr.length == 0) {
+                this.n = 0;
+                this.tree = new int[0];
+                return;
+            }
+            this.n = arr.length;
+            this.tree = new int[4 * n];
+            build(1, 0, n - 1, arr);
+        }
+        
+        private void build(int node, int left, int right, int[] arr) {
+            if (left == right) {
+                tree[node] = arr[left];
+                return;
+            }
+            int mid = left + (right - left) / 2;
+            build(node * 2, left, mid, arr);
+            build(node * 2 + 1, mid + 1, right, arr);
+            tree[node] = Math.max(tree[node * 2], tree[node * 2 + 1]);
+        }
+        
+        public int query(int queryLeft, int queryRight) {
+            if (n == 0 || queryLeft > queryRight) {
+                return Integer.MIN_VALUE;
+            }
+            return query(1, 0, n - 1, queryLeft, queryRight);
+        }
+        
+        private int query(int node, int left, int right, int queryLeft, int queryRight) {
+            if (queryRight < left || queryLeft > right) {
+                return Integer.MIN_VALUE;
+            }
+            if (queryLeft <= left && right <= queryRight) {
+                return tree[node];
+            }
+            int mid = left + (right - left) / 2;
+            int leftMax = query(node * 2, left, mid, queryLeft, queryRight);
+            int rightMax = query(node * 2 + 1, mid + 1, right, queryLeft, queryRight);
+            return Math.max(leftMax, rightMax);
+        }
+    }
+
+    public List<Integer> maxActiveSectionsAfterTrade(String s, int[][] queries) {
+        if (s == null || s.isEmpty() || queries == null) {
+            return new ArrayList<>();
+        }
+        
+        int n = s.length();
+        
+        int totalOnes = 0;
+        for (char ch : s.toCharArray()) {
+            if (ch == '1') {
+                totalOnes++;
+            }
+        }
+        List<Integer> zeroBlockLength = new ArrayList<>();
+        List<Integer> zeroBlockStart = new ArrayList<>();
+        List<Integer> zeroBlockEnd = new ArrayList<>();
+        
+        int i = 0;
+        while (i < n) {
+            int start = i;
+            while (i < n && s.charAt(i) == s.charAt(start)) {
+                i++;
+            }
+            if (s.charAt(start) == '0') {
+                zeroBlockLength.add(i - start);
+                zeroBlockStart.add(start);
+                zeroBlockEnd.add(i - 1);
+            }
+        }
+        int blockCount = zeroBlockLength.size();
+        
+        if (blockCount < 2) {
+            List<Integer> answer = new ArrayList<>();
+            for (int[] query : queries) {
+                answer.add(totalOnes);
+            }
+            return answer;
+        }
+        int[] pairSum = new int[blockCount - 1];
+        for (int j = 0; j < blockCount - 1; j++) {
+            pairSum[j] = zeroBlockLength.get(j) + zeroBlockLength.get(j + 1);
+        }
+        SegmentTree segmentTree = new SegmentTree(pairSum);
+        List<Integer> answer = new ArrayList<>();
+        
+        for (int[] query : queries) {
+            int left = Math.max(0, query[0]);
+            int right = Math.min(n - 1, query[1]);
+            
+            if (left > right) {
+                answer.add(totalOnes);
+                continue;
+            }
+            int firstBlock = lowerBound(zeroBlockEnd, left);
+            int lastBlock = upperBound(zeroBlockStart, right) - 1;
+            
+            if (firstBlock >= blockCount || lastBlock < 0 || firstBlock >= lastBlock) {
+                answer.add(totalOnes);
+                continue;
+            }
+            
+            int firstLength = Math.min(zeroBlockEnd.get(firstBlock), right) - Math.max(zeroBlockStart.get(firstBlock), left) + 1;
+            
+            int lastLength = Math.min(zeroBlockEnd.get(lastBlock), right) - Math.max(zeroBlockStart.get(lastBlock), left) + 1;
+            
+            if (firstBlock + 1 == lastBlock) {
+                int bestGain = firstLength + lastLength;
+                answer.add(totalOnes + bestGain);
+                continue;
+            }
+            int option1 = firstLength + zeroBlockLength.get(firstBlock + 1);
+            int option2 = zeroBlockLength.get(lastBlock - 1) + lastLength;
+            
+            int option3 = Integer.MIN_VALUE;
+            if (firstBlock + 1 <= lastBlock - 2) {
+                option3 = segmentTree.query(firstBlock + 1, lastBlock - 2);
+            }
+            int bestGain = Math.max(option1, Math.max(option2, option3));
+            answer.add(totalOnes + bestGain);
+        }
+        return answer;
+    }
+    
+    private int lowerBound(List<Integer> list, int target) {
+        int left = 0;
+        int right = list.size();
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (list.get(mid) < target) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        return left;
+    }
+    
+    private int upperBound(List<Integer> list, int target) {
+        int left = 0;
+        int right = list.size();
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (list.get(mid) <= target) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        return left;
+    }
+}
