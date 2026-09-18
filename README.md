@@ -8,6 +8,7 @@ A collection of LeetCode questions to ace the coding interview! - Created using 
 ## Hash Table
 |  |
 | ------- |
+| [1520-maximum-number-of-non-overlapping-substrings](https://github.com/Mohd-Aftab-11/Leetcode-Java/tree/master/1520-maximum-number-of-non-overlapping-substrings) |
 | [3483-unique-3-digit-even-numbers](https://github.com/Mohd-Aftab-11/Leetcode-Java/tree/master/3483-unique-3-digit-even-numbers) |
 ## Recursion
 |  |
@@ -25,4 +26,16 @@ A collection of LeetCode questions to ace the coding interview! - Created using 
 |  |
 | ------- |
 | [0836-rectangle-overlap](https://github.com/Mohd-Aftab-11/Leetcode-Java/tree/master/0836-rectangle-overlap) |
+## String
+|  |
+| ------- |
+| [1520-maximum-number-of-non-overlapping-substrings](https://github.com/Mohd-Aftab-11/Leetcode-Java/tree/master/1520-maximum-number-of-non-overlapping-substrings) |
+## Greedy
+|  |
+| ------- |
+| [1520-maximum-number-of-non-overlapping-substrings](https://github.com/Mohd-Aftab-11/Leetcode-Java/tree/master/1520-maximum-number-of-non-overlapping-substrings) |
+## Sorting
+|  |
+| ------- |
+| [1520-maximum-number-of-non-overlapping-substrings](https://github.com/Mohd-Aftab-11/Leetcode-Java/tree/master/1520-maximum-number-of-non-overlapping-substrings) |
 <!---LeetCode Topics End-->
